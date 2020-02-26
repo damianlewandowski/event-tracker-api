@@ -40,12 +40,6 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
-    def get_permissions(self):
-        if self.request.method == 'POST':
-            self.permission_classes = (AllowAny,)
-
-        return super(UserViewSet, self).get_permissions()
-
 
 @api_view(['GET'])
 def api_root(request, format=None):
