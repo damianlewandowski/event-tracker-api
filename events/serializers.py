@@ -26,10 +26,21 @@ class EventSerializer(serializers.HyperlinkedModelSerializer):
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     events = serializers.HyperlinkedRelatedField(many=True, view_name='event-detail', read_only=True)
     comments = serializers.HyperlinkedRelatedField(many=True, view_name='comment-detail', read_only=True)
+    password = serializers.CharField(write_only=True)
+
+    def create(self, validated_data):
+        user = User.objects.create_user(**validated_data)
+        return user
+
+    def update(self, instance, validated_data):
+        if 'password' in validated_data:
+            password = validated_data.pop('password')
+            instance.set_password(password)
+        return super(UserSerializer, self).update(instance, validated_data)
 
     class Meta:
         model = User
-        fields = ['url', 'id', 'username', 'events', 'comments']
+        fields = ['url', 'id', 'username', 'events', 'comments', 'password']
 
 
 class RatingSerializer(serializers.HyperlinkedModelSerializer):
@@ -40,3 +51,4 @@ class RatingSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Rating
         fields = ['url', 'id', 'owner', 'upvotes', 'downvotes', 'event', 'comment']
+

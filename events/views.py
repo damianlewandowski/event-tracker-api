@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework import permissions, viewsets
 from rest_framework.decorators import api_view
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 
@@ -35,9 +36,15 @@ class RatingViewSet(viewsets.ModelViewSet):
         serializer.save(owner=self.request.user)
 
 
-class UserViewSet(viewsets.ReadOnlyModelViewSet):
+class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            self.permission_classes = (AllowAny,)
+
+        return super(UserViewSet, self).get_permissions()
 
 
 @api_view(['GET'])
